@@ -1,4 +1,4 @@
-<a class="skip-link" href="#main">Skip to main content</a>
+ <a class="skip-link" href="#main">Skip to main content</a>
 
 <section class="hd-header bg-white rounded-xl shadow-sm border border-slate-100 px-4 py-3 mb-6 flex items-center justify-between">
   <div class="hd-header__left flex items-center gap-3">
@@ -19,9 +19,7 @@
       <div class="hd-filters flex gap-2 flex-wrap" role="group" aria-label="Overview filters">
         <p-dropdown
           [options]="deviceOptions"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="filters().device"
+          [(ngModel)]="filters().device"
           (onChange)="updateFilter('device', $event.value)"
           [style]="{minWidth:'12rem'}"
           [showClear]="false"
@@ -29,9 +27,7 @@
         ></p-dropdown>
         <p-dropdown
           [options]="periodOptions"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="filters().period"
+          [(ngModel)]="filters().period"
           (onChange)="updateFilter('period', $event.value)"
           [style]="{minWidth:'10rem'}"
           [showClear]="false"
@@ -39,9 +35,7 @@
         ></p-dropdown>
         <p-dropdown
           [options]="regionOptions"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="filters().region"
+          [(ngModel)]="filters().region"
           (onChange)="updateFilter('region', $event.value)"
           [style]="{minWidth:'10rem'}"
           [showClear]="false"
@@ -101,7 +95,7 @@
         </div>
       </article>
 
-      <!-- Chart using ng-apexcharts with safe fallback placeholder if charts cannot render yet -->
+      <!-- Chart using ng-apexcharts -->
       <article class="panel panel--chart rounded-xl border border-slate-100 shadow-sm overflow-hidden" aria-labelledby="panel-chart-heading">
         <header class="panel__header flex items-center justify-between px-4 py-3 border-b border-slate-100">
           <h3 id="panel-chart-heading" class="hd-h3 font-semibold text-[clamp(14px,1.4vw,18px)]">Trend</h3>
@@ -112,27 +106,20 @@
           </div>
         </header>
         <div class="panel__body p-4">
-          <ng-container *ngIf="canRenderCharts; else chartPlaceholder">
-            <apx-chart
-              [series]="chartSeries"
-              [chart]="chartOptions.chart"
-              [dataLabels]="chartOptions.dataLabels"
-              [stroke]="chartOptions.stroke"
-              [xaxis]="chartOptions.xaxis"
-              [yaxis]="chartOptions.yaxis"
-              [legend]="chartOptions.legend"
-              [fill]="chartOptions.fill"
-              [grid]="chartOptions.grid"
-              [markers]="chartOptions.markers"
-              [tooltip]="chartOptions.tooltip"
-              [colors]="chartOptions.colors"
-            ></apx-chart>
-          </ng-container>
-          <ng-template #chartPlaceholder>
-            <div class="chart-placeholder rounded-md border border-dashed border-slate-200" role="img" aria-label="Chart placeholder while chart library loads">
-              <!-- minimal placeholder to avoid layout shift -->
-            </div>
-          </ng-template>
+          <apx-chart
+            [series]="chartSeries"
+            [chart]="chartOptions.chart"
+            [dataLabels]="chartOptions.dataLabels"
+            [stroke]="chartOptions.stroke"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [legend]="chartOptions.legend"
+            [fill]="chartOptions.fill"
+            [grid]="chartOptions.grid"
+            [markers]="chartOptions.markers"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+          ></apx-chart>
         </div>
       </article>
     </div>

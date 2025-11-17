@@ -4,7 +4,12 @@
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
 
-/* Keep Tailwind directives if present elsewhere (none here) and preserve existing global styles */
+/* Tailwind layers - must be after PrimeNG imports to avoid overriding theme variables unintentionally */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Keep Tailwind directives present and preserve existing global styles */
 * {
   margin: 0;
   padding: 0;
@@ -15,4 +20,17 @@ html, body {
   height: 100%;
   background-color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Minimal utility verification and helpers (non-invasive) */
+:root {
+  /* bridge CSS vars for theme tokens to Tailwind extended palette (optional) */
+  --ocean-bg: #f9fafb;
+  --ocean-text: #111827;
+}
+body {
+  /* If Tailwind loads correctly, these classes used in templates will style elements.
+     Global body color also aligned with Ocean Professional */
+  color: var(--ocean-text);
+  background: var(--ocean-bg);
 }

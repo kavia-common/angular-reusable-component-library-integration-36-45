@@ -2,6 +2,19 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.1.
 
+## Tailwind CSS
+
+Tailwind is configured via `postcss.config.js` and `tailwind.config.js`. PrimeNG theme CSS imports remain first in `src/styles.css`, followed by Tailwind directives (`@tailwind base; @tailwind components; @tailwind utilities;`) to ensure compatibility with PrimeNG.
+
+- Content paths: `./src/**/*.{html,ts}`, `./src/index.html`
+- Theme: extended using Ocean Professional tokens (primary `#2563EB`, secondary `#F59E0B`, background `#f9fafb`, surface `#ffffff`, text `#111827`)
+- Example usage is present in `app.component.html` (utility classes on the nav and link).
+
+If utilities are not applied at runtime, ensure dev dependencies are installed:
+```
+npm install
+```
+
 ## Development server
 
 To start a local development server, run:
