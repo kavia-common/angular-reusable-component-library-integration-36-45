@@ -29,7 +29,6 @@ const ensureServerFetch = async () => {
     // Lazy require node-fetch for SSR if missing; guard to avoid bundler resolution failures
     try {
       const require = createRequire(import.meta.url);
-      // eslint-disable-next-line
       const mod: any = (() => { try { return require('node-fetch'); } catch { return null; } })();
       if (mod) {
         g.fetch = (mod as any).default || (mod as any);
@@ -41,7 +40,6 @@ const ensureServerFetch = async () => {
   if (typeof g.AbortController === 'undefined') {
     try {
       const require = createRequire(import.meta.url);
-      // eslint-disable-next-line
       const acMod: any = (() => { try { return require('abort-controller'); } catch { return null; } })();
       if (acMod) {
         g.AbortController = (acMod as any).default || (acMod as any);
