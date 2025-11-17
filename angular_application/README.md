@@ -19,12 +19,18 @@ If you see a CLI message "Tailwind CSS configuration file found but the 'tailwin
 npm i -D tailwindcss postcss autoprefixer
 ```
 
+Note: In CI environments, make sure devDependencies are installed so Tailwind is present (CI should not use --omit=dev). Otherwise the build may log a Tailwind missing warning.
+
 ## Development server
 
-To start a local development server, run:
-
+To start a local development server (Vite dev server via Angular builder with custom vite.config.ts):
 ```bash
-ng serve
+# Port precedence: PORT > NG_APP_PORT > default 4200
+PORT=4200 ng serve --host 0.0.0.0
+```
+On startup you will see a diagnostic log like:
+```
+[vite-config] server.host=0.0.0.0, server.port=4200, allowedHosts=["localhost","127.0.0.1","[::1]","vscode-internal-22785-beta.beta01.cloud.kavia.ai","*"]
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
