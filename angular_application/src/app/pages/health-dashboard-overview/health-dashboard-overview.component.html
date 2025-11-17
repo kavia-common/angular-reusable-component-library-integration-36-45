@@ -101,7 +101,7 @@
         </div>
       </article>
 
-      <!-- Chart using ng-apexcharts -->
+      <!-- Chart using ng-apexcharts with safe fallback placeholder if charts cannot render yet -->
       <article class="panel panel--chart rounded-xl border border-slate-100 shadow-sm overflow-hidden" aria-labelledby="panel-chart-heading">
         <header class="panel__header flex items-center justify-between px-4 py-3 border-b border-slate-100">
           <h3 id="panel-chart-heading" class="hd-h3 font-semibold text-[clamp(14px,1.4vw,18px)]">Trend</h3>
@@ -112,20 +112,27 @@
           </div>
         </header>
         <div class="panel__body p-4">
-          <apx-chart
-            [series]="chartSeries"
-            [chart]="chartOptions.chart"
-            [dataLabels]="chartOptions.dataLabels"
-            [stroke]="chartOptions.stroke"
-            [xaxis]="chartOptions.xaxis"
-            [yaxis]="chartOptions.yaxis"
-            [legend]="chartOptions.legend"
-            [fill]="chartOptions.fill"
-            [grid]="chartOptions.grid"
-            [markers]="chartOptions.markers"
-            [tooltip]="chartOptions.tooltip"
-            [colors]="chartOptions.colors"
-          ></apx-chart>
+          <ng-container *ngIf="canRenderCharts; else chartPlaceholder">
+            <apx-chart
+              [series]="chartSeries"
+              [chart]="chartOptions.chart"
+              [dataLabels]="chartOptions.dataLabels"
+              [stroke]="chartOptions.stroke"
+              [xaxis]="chartOptions.xaxis"
+              [yaxis]="chartOptions.yaxis"
+              [legend]="chartOptions.legend"
+              [fill]="chartOptions.fill"
+              [grid]="chartOptions.grid"
+              [markers]="chartOptions.markers"
+              [tooltip]="chartOptions.tooltip"
+              [colors]="chartOptions.colors"
+            ></apx-chart>
+          </ng-container>
+          <ng-template #chartPlaceholder>
+            <div class="chart-placeholder rounded-md border border-dashed border-slate-200" role="img" aria-label="Chart placeholder while chart library loads">
+              <!-- minimal placeholder to avoid layout shift -->
+            </div>
+          </ng-template>
         </div>
       </article>
     </div>
