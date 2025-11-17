@@ -21,6 +21,8 @@
       type="button"
       class="p-button px-3 py-2 rounded-md text-white"
       style="background:#2563EB;border-color:#2563EB"
+      aria-label="Create new report"
+      title="New Report"
     >
       New Report
     </button>
@@ -41,6 +43,8 @@
           [style]="{minWidth:'12rem'}"
           [showClear]="false"
           placeholder="Device"
+          inputId="filter-device"
+          aria-label="Filter by device type"
         ></p-dropdown>
         <p-dropdown
           [options]="periodOptions"
@@ -49,6 +53,8 @@
           [style]="{minWidth:'10rem'}"
           [showClear]="false"
           placeholder="Period"
+          inputId="filter-period"
+          aria-label="Filter by time period"
         ></p-dropdown>
         <p-dropdown
           [options]="regionOptions"
@@ -57,6 +63,8 @@
           [style]="{minWidth:'10rem'}"
           [showClear]="false"
           placeholder="Region"
+          inputId="filter-region"
+          aria-label="Filter by region"
         ></p-dropdown>
       </div>
     </div>

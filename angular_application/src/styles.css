@@ -5,7 +5,8 @@
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
 
-/* Tailwind layers - must be after PrimeNG imports to avoid overriding theme variables unintentionally */
+/* Tailwind layers - must be after PrimeNG imports to avoid overriding PrimeNG's CSS vars and specificity.
+   Keep this order intact if adding new global styles. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
