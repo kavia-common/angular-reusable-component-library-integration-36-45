@@ -1,0 +1,48 @@
+/* Summary (final review): Common CSS confirms safe fallbacks, focus-visible defaults, and base typography tokens. */
+:root {
+  /* Existing tokens retained. Additional screen-wide defaults below */
+  scroll-behavior: smooth;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  /* Use safe fallbacks if design tokens are missing */
+  background: var(--color-ffffff, #ffffff);
+  color: var(--color-21272a, #21272a);
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Accessibility helpers */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+[role="button"],
+button,
+a { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+
+/* Utility classes */
+.abs { position: absolute; }
+.rel { position: relative; }
+.flex-row { display: flex; flex-direction: row; }
+.flex-col { display: flex; flex-direction: column; }
+.shadow-0 { box-shadow: var(--shadow-0, 0 0 0 rgba(0,0,0,0)); }
+.shadow-1 { box-shadow: var(--shadow-1, 0 1px 2px rgba(0,0,0,0.06)); }
+.shadow-2 { box-shadow: var(--shadow-2, 0 2px 8px rgba(0,0,0,0.12)); }
+.hidden { display: none !important; }
+
+/* Cross-browser safe focus ring fallback */
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible { outline: 2px solid var(--color-0f62fe, #0f62fe); outline-offset: 2px; }
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

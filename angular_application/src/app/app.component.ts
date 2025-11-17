@@ -1,34 +1,17 @@
 import { Component } from '@angular/core';
-import { FigmaService } from './services/figma.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  standalone: true,
+  imports: [RouterModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'Hello, angular';
-  demo = {
-    projectId: '36',
-    fileKey: '',
-    accessToken: '',
-  };
-  output = '';
 
   // PUBLIC_INTERFACE
-  /** Handles demo form submission to call the Figma import API and display result. */
-  async onSubmit(ev: any) {
-    if (ev && typeof ev.preventDefault === 'function') {
-      ev.preventDefault();
-    }
-    this.output = 'Sending...';
-    try {
-      const resp = await FigmaService.addFigmaData(this.demo.projectId, this.demo.fileKey, this.demo.accessToken);
-      const text = await resp.text();
-      this.output = `Status: ${resp.status}\n${text}`;
-    } catch (e: any) {
-      this.output = `Client error: ${e?.message || e}`;
-    }
-  }
+  /** No-op kept to preserve previous public API surface if referenced elsewhere. */
+  async onSubmit(_ev: any) { /* deprecated in new layout */ }
 }

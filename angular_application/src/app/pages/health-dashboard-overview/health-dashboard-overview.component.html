@@ -1,0 +1,153 @@
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<section class="hd-header bg-white rounded-xl shadow-sm border border-slate-100 px-4 py-3 mb-6 flex items-center justify-between">
+  <div class="hd-header__left flex items-center gap-3">
+    <h1 id="page-title" class="hd-title font-bold text-[clamp(18px,2vw,22px)]">Welcome, {{ username }}!</h1>
+  </div>
+  <nav class="hd-header__actions flex items-center gap-2" aria-label="Header actions">
+    <button type="button" class="btn btn--ghost px-3 py-2 rounded-md border border-slate-200" aria-label="Notifications">•</button>
+    <button type="button" class="btn btn--primary px-3 py-2 rounded-md text-white" style="background:#2563EB">New Report</button>
+  </nav>
+</section>
+
+<main id="main" class="hd-main grid gap-6" role="main">
+  <!-- Overview -->
+  <section class="hd-overview bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+    <div class="hd-section__header flex items-center justify-between gap-4 flex-wrap">
+      <h2 id="overview-heading" class="hd-h2 font-semibold text-[clamp(16px,1.6vw,20px)]">Overview</h2>
+
+      <div class="hd-filters flex gap-2 flex-wrap" role="group" aria-label="Overview filters">
+        <select [value]="filters().device" (change)="updateFilter('device', ($any($event.target).value))" class="border rounded-md px-2 py-1">
+          <option *ngFor="let o of deviceOptions; trackBy: trackByIndex" [value]="o">{{ o }}</option>
+        </select>
+        <select [value]="filters().period" (change)="updateFilter('period', ($any($event.target).value))" class="border rounded-md px-2 py-1">
+          <option *ngFor="let o of periodOptions; trackBy: trackByIndex" [value]="o">{{ o }}</option>
+        </select>
+        <select [value]="filters().region" (change)="updateFilter('region', ($any($event.target).value))" class="border rounded-md px-2 py-1">
+          <option *ngFor="let o of regionOptions; trackBy: trackByIndex" [value]="o">{{ o }}</option>
+        </select>
+      </div>
+    </div>
+
+    <ul class="hd-metrics grid grid-cols-1 md:grid-cols-3 gap-4 mt-6" role="list">
+      <li
+        *ngFor="let m of metrics(); trackBy: trackByIndex"
+        class="metric-card p-4 grid gap-1 rounded-lg border"
+        [ngClass]="{
+          'ok border-emerald-300/60': m.tone === 'ok',
+          'warn border-amber-300/60': m.tone === 'warn',
+          'error border-rose-300/60': m.tone === 'error'
+        }"
+        [attr.aria-label]="m.key + ' ' + m.value"
+      >
+        <div class="metric-card__label text-sm text-slate-500">{{ m.key }}</div>
+        <div class="metric-card__value font-bold text-[clamp(18px,2vw,24px)]">{{ m.value }}</div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Device Distribution -->
+  <section class="hd-distribution bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+    <h2 id="distribution-heading" class="hd-h2 font-semibold text-[clamp(16px,1.6vw,20px)]">Device Distribution</h2>
+
+    <div class="hd-distribution__strip grid grid-cols-1 md:grid-cols-3 gap-4 mt-4" role="group" aria-label="Distribution by status">
+      <div *ngFor="let d of distribution(); trackBy: trackByIndex"
+           class="strip-cell rounded-lg px-3 py-2 flex items-center justify-between border"
+           [ngClass]="{
+              'ok bg-emerald-50 text-emerald-800 border-emerald-100': d.tone === 'ok',
+              'warn bg-amber-50 text-amber-800 border-amber-100': d.tone === 'warn',
+              'error bg-rose-50 text-rose-800 border-rose-100': d.tone === 'error'
+            }">
+        <span class="strip-cell__label font-semibold">{{ d.key }}</span>
+        <span class="strip-cell__value font-bold">{{ d.value }}</span>
+      </div>
+    </div>
+
+    <div class="hd-panels grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+      <!-- KPI image panel mapped from asset -->
+      <article class="panel panel--table rounded-xl border border-slate-100 shadow-sm overflow-hidden" aria-labelledby="panel-table-heading">
+        <header class="panel__header flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <h3 id="panel-table-heading" class="hd-h3 font-semibold text-[clamp(14px,1.4vw,18px)]">KPI Snapshot (Last 30d)</h3>
+        </header>
+        <div class="panel__body p-4">
+          <img
+            src="assets/figma_image_525_35699_509_10095.png"
+            alt="KPI cards grid visualization"
+            class="panel__image w-full h-auto rounded-lg"
+            width="1200" height="320"
+            decoding="async" loading="eager"
+          />
+        </div>
+      </article>
+
+      <!-- Simple SVG placeholder chart to avoid external deps -->
+      <article class="panel panel--chart rounded-xl border border-slate-100 shadow-sm overflow-hidden" aria-labelledby="panel-chart-heading">
+        <header class="panel__header flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <h3 id="panel-chart-heading" class="hd-h3 font-semibold text-[clamp(14px,1.4vw,18px)]">Trend</h3>
+          <div aria-hidden="true" class="panel__legend flex gap-3 text-xs text-slate-500">
+            <span class="dot ok inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1"></span> Healthy
+            <span class="dot warn inline-block w-2 h-2 rounded-full bg-amber-500 mr-1"></span> Warning
+            <span class="dot error inline-block w-2 h-2 rounded-full bg-rose-500 mr-1"></span> Anomaly
+          </div>
+        </header>
+        <div class="panel__body p-4">
+          <svg viewBox="0 0 600 220" class="w-full h-auto rounded-md border border-slate-200">
+            <rect x="0" y="0" width="600" height="220" fill="url(#grad)" />
+            <defs>
+              <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="rgba(37,99,235,0.12)"/>
+                <stop offset="100%" stop-color="#ffffff"/>
+              </linearGradient>
+            </defs>
+            <polyline fill="none" stroke="#10B981" stroke-width="2" points="0,160 60,150 120,140 180,135 240,130 300,120 360,110 420,100 480,95 540,90 600,85" />
+            <polyline fill="none" stroke="#F59E0B" stroke-width="2" points="0,190 60,188 120,189 180,187 240,190 300,188 360,189 420,187 480,188 540,189 600,188" />
+            <polyline fill="none" stroke="#EF4444" stroke-width="2" points="0,200 60,198 120,196 180,197 240,195 300,196 360,198 420,197 480,198 540,197 600,196" />
+          </svg>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section class="hd-table bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+    <h2 id="table-heading" class="hd-h2 font-semibold text-[clamp(16px,1.6vw,20px)] mb-4">Device Table</h2>
+
+    <div class="table-wrapper rounded-lg overflow-hidden border border-slate-100">
+      <table style="min-width:40rem;">
+        <thead>
+          <tr>
+            <th scope="col">Device</th>
+            <th scope="col">Location</th>
+            <th scope="col">Status</th>
+            <th scope="col">Last Seen</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of devices(); trackBy: trackByIndex">
+            <td>{{ row.id }}</td>
+            <td>{{ row.location }}</td>
+            <td>
+              <span
+                class="badge inline-block text-xs font-semibold px-2 py-1 rounded-full"
+                [ngClass]="{
+                  'ok bg-emerald-50 text-emerald-800': row.status === 'Healthy',
+                  'warn bg-amber-50 text-amber-800': row.status === 'Warning',
+                  'error bg-rose-50 text-rose-800': row.status === 'Anomaly'
+                }"
+              >{{ row.status }}</span>
+            </td>
+            <td>{{ row.seen }}</td>
+            <td>
+              <button type="button" class="px-2 py-1 border border-slate-200 rounded-md">View</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="hd-footer text-slate-500 text-sm">
+    <small>© 2025 Health Dashboard</small>
+  </footer>
+</main>
