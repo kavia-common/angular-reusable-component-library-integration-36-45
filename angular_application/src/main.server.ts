@@ -2,6 +2,10 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { config } from './app/app.config.server';
 
-const bootstrap = () => bootstrapApplication(AppComponent, config);
+const bootstrap = () => {
+  const portInfo = process.env['PORT'] || process.env['NG_APP_PORT'] || 'unknown';
+  console.log(`[startup] Bootstrapping Angular SSR app (port: ${portInfo})`);
+  return bootstrapApplication(AppComponent, config);
+};
 
 export default bootstrap;

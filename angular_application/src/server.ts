@@ -21,21 +21,33 @@ app.use((req, _res, next) => {
   next();
 });
 
+import { createRequire } from 'node:module';
 // Ensure fetch and AbortController exist in Node SSR environment
 const ensureServerFetch = async () => {
   const g: any = globalThis as any;
   if (typeof g.fetch !== 'function') {
-    // Lazy import node-fetch for SSR if missing
-    const mod = await import('node-fetch');
-    g.fetch = (mod as any).default || (mod as any);
-    // Attach Response type compatibility implicitly via node-fetch
+    // Lazy require node-fetch for SSR if missing; guard to avoid bundler resolution failures
+    try {
+      const require = createRequire(import.meta.url);
+      // eslint-disable-next-line
+      const mod: any = (() => { try { return require('node-fetch'); } catch { return null; } })();
+      if (mod) {
+        g.fetch = (mod as any).default || (mod as any);
+      }
+    } catch {
+      // ignore; if still unavailable, API calls below will be skipped by feature flag checks
+    }
   }
   if (typeof g.AbortController === 'undefined') {
     try {
-      const ac = await import('abort-controller');
-      g.AbortController = (ac as any).default || (ac as any);
+      const require = createRequire(import.meta.url);
+      // eslint-disable-next-line
+      const acMod: any = (() => { try { return require('abort-controller'); } catch { return null; } })();
+      if (acMod) {
+        g.AbortController = (acMod as any).default || (acMod as any);
+      }
     } catch {
-      // Node 18+ has AbortController; ignore if import fails.
+      // Node 18+ has AbortController; ignore if require fails.
     }
   }
 };
@@ -89,7 +101,7 @@ app.post('/api/figma/add_figma_data', async (req, res) => {
       await ensureServerFetch();
       try {
         const controller = new (globalThis as any).AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3500);
+        const timeout = (globalThis as any).setTimeout ? (globalThis as any).setTimeout(() => controller.abort(), 3500) : undefined;
         const resp = await (globalThis as any).fetch(`https://api.figma.com/v1/files/${encodeURIComponent(fileKey)}`, {
           method: 'GET',
           headers: {
@@ -97,7 +109,9 @@ app.post('/api/figma/add_figma_data', async (req, res) => {
           },
           signal: controller.signal,
         });
-        clearTimeout(timeout as any);
+        if ((globalThis as any).clearTimeout && timeout !== undefined) {
+          (globalThis as any).clearTimeout(timeout as any);
+        }
         if (resp.status === 404) {
           return res.status(400).json({
             error: 'Figma file not found',
@@ -172,9 +186,17 @@ app.get('**', (req, res, next) => {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  const portRaw = process.env['PORT'] || process.env['NG_APP_PORT'] || '3001';
+  const port = typeof portRaw === 'string' ? parseInt(portRaw as string, 10) || 3001 : (portRaw as any);
+  const host = '0.0.0.0';
+  const healthPath = process.env['NG_APP_HEALTHCHECK_PATH'] || '/healthz';
+  // Lightweight health endpoint
+  app.get(healthPath, (_req, res) => res.status(200).json({ status: 'ok' }));
+
+  app.listen(port, host, () => {
+    // Health/readiness logs
+    console.log(`[startup] Angular SSR/Express server listening on http://${host}:${port}`);
+    console.log(`[startup] Health endpoint: http://${host}:${port}${healthPath}`);
   });
 }
 

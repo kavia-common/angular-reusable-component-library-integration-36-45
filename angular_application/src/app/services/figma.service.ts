@@ -19,7 +19,8 @@
      const base = (await import('../env.config')).EnvConfig.apiBase();
      const url = `${base}/api/figma/add_figma_data?project_id=${encodeURIComponent(String(projectId))}`;
      const g: any = (typeof globalThis !== 'undefined' ? (globalThis as any) : {});
-     const f = typeof g.fetch === 'function' ? g.fetch : (typeof fetch !== 'undefined' ? fetch : undefined);
+     // Prefer globalThis.fetch; avoid referencing bare `fetch` for eslint no-undef safety.
+     const f = typeof g.fetch === 'function' ? g.fetch : undefined;
      if (!f) throw new Error('Fetch API is not available in this environment');
      return f(url, {
        method: 'POST',
