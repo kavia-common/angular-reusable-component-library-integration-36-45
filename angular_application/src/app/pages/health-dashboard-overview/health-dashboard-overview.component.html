@@ -5,8 +5,23 @@
     <h1 id="page-title" class="hd-title font-bold text-[clamp(18px,2vw,22px)]">Welcome, {{ username }}!</h1>
   </div>
   <nav class="hd-header__actions flex items-center gap-2" aria-label="Header actions">
-    <button pButton type="button" class="p-button-text px-3 py-2 rounded-md border border-slate-200" aria-label="Notifications">•</button>
-    <button pButton type="button" class="p-button px-3 py-2 rounded-md text-white" style="background:#2563EB;border-color:#2563EB">New Report</button>
+    <button
+      pButton
+      type="button"
+      class="p-button-outlined px-3 py-2 rounded-md border border-slate-200"
+      aria-label="Notifications"
+      title="Notifications"
+    >
+      •
+    </button>
+    <button
+      pButton
+      type="button"
+      class="p-button px-3 py-2 rounded-md text-white"
+      style="background:#2563EB;border-color:#2563EB"
+    >
+      New Report
+    </button>
   </nav>
 </section>
 
@@ -130,18 +145,22 @@
     <h2 id="table-heading" class="hd-h2 font-semibold text-[clamp(16px,1.6vw,20px)] mb-4">Device Table</h2>
 
     <div class="table-wrapper rounded-lg overflow-hidden border border-slate-100">
-      <table style="min-width:40rem;">
-        <thead>
+      <p-table
+        [value]="devices()"
+        [tableStyle]="{'min-width':'40rem'}"
+        styleClass="w-full"
+      >
+        <ng-template pTemplate="header">
           <tr>
-            <th scope="col">Device</th>
-            <th scope="col">Location</th>
-            <th scope="col">Status</th>
-            <th scope="col">Last Seen</th>
-            <th scope="col">Actions</th>
+            <th scope="col" class="text-left">Device</th>
+            <th scope="col" class="text-left">Location</th>
+            <th scope="col" class="text-left">Status</th>
+            <th scope="col" class="text-left">Last Seen</th>
+            <th scope="col" class="text-left">Actions</th>
           </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of devices(); trackBy: trackByIndex">
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+          <tr [attr.data-index]="i">
             <td>{{ row.id }}</td>
             <td>{{ row.location }}</td>
             <td>
@@ -155,8 +174,8 @@
               <button pButton type="button" class="p-button-outlined px-2 py-1 rounded-md">View</button>
             </td>
           </tr>
-        </tbody>
-      </table>
+        </ng-template>
+      </p-table>
     </div>
   </section>
 

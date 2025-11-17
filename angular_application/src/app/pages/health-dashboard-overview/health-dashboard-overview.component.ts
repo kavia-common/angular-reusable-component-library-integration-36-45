@@ -41,7 +41,12 @@ import type {
     NgApexchartsModule
   ],
   templateUrl: './health-dashboard-overview.component.html',
-  styleUrls: ['./health-dashboard-overview.component.css'],
+  styleUrls: [
+    './health-dashboard-overview.component.css',
+    // Bring in design system and screen-specific styles for pixel fidelity
+    '../../../assets/common.css',
+    '../../../assets/health-dashboardoverview-525-31813.css'
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HealthDashboardOverviewComponent {

@@ -50,3 +50,16 @@
   outline: 2px solid var(--brand-primary);
   outline-offset: 2px;
 }
+
+/* Ensure PrimeNG table header aligns with Figma header BG */
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background: #f8fafc;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Tighten PrimeNG paddings for compact look */
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
