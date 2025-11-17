@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, WritableSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, WritableSignal, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +31,7 @@ import type {
  * HealthDashboardOverviewComponent
  * A standalone Angular 19 component rendering the Health Dashboard Overview screen using PrimeNG widgets,
  * ng-apexcharts for charts, and Tailwind utility classes for layout polish. Styles are mapped to Ocean Professional theme.
+ * PrimeNG modules (Dropdown, Button, Tag, Table), ng-apexcharts and FormsModule are imported in the standalone component.
  */
 @Component({
   selector: 'app-health-dashboard-overview',
@@ -56,8 +58,13 @@ import type {
 export class HealthDashboardOverviewComponent {
   protected readonly username = 'John Doe';
 
-  // Soft chart render guard (kept for future SSR conditions)
-  readonly canRenderCharts = true;
+  // Soft chart render guard (browser-only) to avoid SSR window references from charting lib
+  private readonly platformId = inject(PLATFORM_ID);
+  canRenderCharts = false;
+
+  constructor() {
+    this.canRenderCharts = isPlatformBrowser(this.platformId);
+  }
 
   // Filters state
   filters: WritableSignal<{ device: string; period: string; region: string }> = signal({
@@ -114,7 +121,7 @@ export class HealthDashboardOverviewComponent {
     { name: 'Warning', data: [90, 88, 89, 87, 90, 88, 89, 87, 88, 89, 88, 88] },
     { name: 'Anomaly', data: [80, 82, 84, 83, 85, 84, 82, 83, 82, 83, 84, 85] },
   ];
-  chartOptions: {
+  get chartOptions(): {
     chart: ApexChart;
     dataLabels: ApexDataLabels;
     stroke: ApexStroke;
@@ -126,22 +133,25 @@ export class HealthDashboardOverviewComponent {
     markers: ApexMarkers;
     tooltip: ApexTooltip;
     colors: string[];
-  } = {
-    chart: { type: 'area', height: 300, toolbar: { show: false }, animations: { enabled: true } },
-    dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 2 },
-    xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748b' } }
-    },
-    yaxis: { labels: { style: { colors: '#64748b' } } },
-    legend: { position: 'top', horizontalAlign: 'left', labels: { colors: '#64748b' } },
-    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.01, stops: [0, 95, 100] } },
-    grid: { borderColor: '#e2e8f0', strokeDashArray: 4 },
-    markers: { size: 0 },
-    tooltip: { theme: 'light' },
-    colors: ['#10B981', '#F59E0B', '#EF4444']
-  };
+  } {
+    // Avoid constructing objects that could be mutated by the lib during SSR
+    return {
+      chart: { type: 'area', height: 300, toolbar: { show: false }, animations: { enabled: true } },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: 2 },
+      xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748b' } }
+      },
+      yaxis: { labels: { style: { colors: '#64748b' } } },
+      legend: { position: 'top', horizontalAlign: 'left', labels: { colors: '#64748b' } },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.01, stops: [0, 95, 100] } },
+      grid: { borderColor: '#e2e8f0', strokeDashArray: 4 },
+      markers: { size: 0 },
+      tooltip: { theme: 'light' },
+      colors: ['#10B981', '#F59E0B', '#EF4444']
+    };
+  }
 
   // PUBLIC_INTERFACE
   /** Update an inline filter option by key and value. */

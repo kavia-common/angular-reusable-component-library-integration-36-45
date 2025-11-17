@@ -68,3 +68,8 @@
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
   border-bottom: 1px solid #f1f5f9;
 }
+
+/* Guard container width for pixel fidelity while allowing Tailwind responsive spacing */
+:host {
+  display: block;
+}

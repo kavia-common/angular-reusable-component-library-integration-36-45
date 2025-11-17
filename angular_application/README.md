@@ -14,6 +14,10 @@ If utilities are not applied at runtime, ensure dev dependencies are installed:
 ```
 npm install
 ```
+If you see a CLI message "Tailwind CSS configuration file found but the 'tailwindcss' package is not installed", install it:
+```
+npm i -D tailwindcss postcss autoprefixer
+```
 
 ## Development server
 

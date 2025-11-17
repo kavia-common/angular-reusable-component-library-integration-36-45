@@ -25,7 +25,7 @@
   </nav>
 </section>
 
-<main id="main" class="hd-main grid gap-6" role="main">
+<main id="main" class="hd-main grid gap-6 container mx-auto max-w-[1440px] px-4 lg:px-6" role="main">
   <!-- Overview -->
   <section class="hd-overview bg-white rounded-xl shadow-sm border border-slate-100 p-6">
     <div class="hd-section__header flex items-center justify-between gap-4 flex-wrap">
@@ -121,20 +121,26 @@
           </div>
         </header>
         <div class="panel__body p-4">
-          <apx-chart
-            [series]="chartSeries"
-            [chart]="chartOptions.chart"
-            [dataLabels]="chartOptions.dataLabels"
-            [stroke]="chartOptions.stroke"
-            [xaxis]="chartOptions.xaxis"
-            [yaxis]="chartOptions.yaxis"
-            [legend]="chartOptions.legend"
-            [fill]="chartOptions.fill"
-            [grid]="chartOptions.grid"
-            [markers]="chartOptions.markers"
-            [tooltip]="chartOptions.tooltip"
-            [colors]="chartOptions.colors"
-          ></apx-chart>
+          <!-- SSR guard: render charts only in the browser -->
+          <ng-container *ngIf="canRenderCharts; else chartSsrStub">
+            <apx-chart
+              [series]="chartSeries"
+              [chart]="chartOptions.chart"
+              [dataLabels]="chartOptions.dataLabels"
+              [stroke]="chartOptions.stroke"
+              [xaxis]="chartOptions.xaxis"
+              [yaxis]="chartOptions.yaxis"
+              [legend]="chartOptions.legend"
+              [fill]="chartOptions.fill"
+              [grid]="chartOptions.grid"
+              [markers]="chartOptions.markers"
+              [tooltip]="chartOptions.tooltip"
+              [colors]="chartOptions.colors"
+            ></apx-chart>
+          </ng-container>
+          <ng-template #chartSsrStub>
+            <div class="chart-placeholder rounded-lg border border-slate-200" role="img" aria-label="Chart placeholder"></div>
+          </ng-template>
         </div>
       </article>
     </div>

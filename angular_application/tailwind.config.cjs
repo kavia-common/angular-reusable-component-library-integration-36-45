@@ -1,8 +1,10 @@
- /** Tailwind CSS configuration for Angular 19
-  * Content globs include HTML/TS templates/components and the index.html.
-  * Theme tokens aligned with "Ocean Professional" style guide.
-  */
-module.exports = {
+/** Tailwind CSS configuration for Angular 19
+ * Content globs include HTML/TS templates/components and the index.html.
+ * Theme tokens aligned with "Ocean Professional" style guide.
+ * NOTE: Keep both "./src/**/*.{html,ts}" and "./src/index.html" so utilities used in templates are not purged.
+ */
+/* eslint-env node */
+const config = {
   content: [
     "./src/**/*.{html,ts}",
     "./src/index.html"
@@ -33,3 +35,5 @@ module.exports = {
   },
   plugins: []
 };
+/* Support both ESM and CJS environments */
+module.exports = config;

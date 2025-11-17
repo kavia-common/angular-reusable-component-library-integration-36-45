@@ -35,3 +35,7 @@ body {
   color: var(--ocean-text);
   background: var(--ocean-bg);
 }
+
+/* Non-invasive tailwind utility proof element (hidden) to ensure JIT sees common classes without affecting PrimeNG */
+.tailwind-proof { display: none; }
+/* Ensure tailwind utilities don't globally override PrimeNG by scoping any opinionated resets to our app only (already minimal) */

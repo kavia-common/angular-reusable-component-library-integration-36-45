@@ -9,6 +9,9 @@ export default [
       "build/**",
       "coverage/**",
       "*.config.mjs",
+      // Ignore Tailwind config files (CJS/JS) from linting to avoid parser issues
+      "tailwind.config.cjs",
+      "tailwind.config.js",
     ]
   },
   {

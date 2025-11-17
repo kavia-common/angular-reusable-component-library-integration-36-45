@@ -1,0 +1,3 @@
+# Ignore Tailwind config files which are executed by Node (CJS/ESM), not transpiled app sources
+tailwind.config.cjs
+tailwind.config.js
