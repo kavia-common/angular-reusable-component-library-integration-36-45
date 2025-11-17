@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, WritableSignal, signal, inject } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ChangeDetectionStrategy, Component, WritableSignal, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -25,20 +25,24 @@ import type {
   ApexYAxis
 } from 'ng-apexcharts';
 
-// PUBLIC_INTERFACE
+/**
+ * PUBLIC_INTERFACE
+ * HealthDashboardOverviewComponent
+ * A standalone Angular 19 component rendering the Health Dashboard Overview screen using PrimeNG widgets,
+ * ng-apexcharts for charts, and Tailwind utility classes for layout polish. Styles are mapped to Ocean Professional theme.
+ */
 @Component({
   selector: 'app-health-dashboard-overview',
   standalone: true,
   imports: [
     CommonModule,
     RouterModule,
-    FormsModule,
-    DropdownModule,
-    ButtonModule,
-    TagModule,
-    TableModule,
-    // Keep charts as module import; template guards below avoid runtime errors if package not yet installed
-    NgApexchartsModule
+    FormsModule,        // Ensure [(ngModel)] in p-dropdown is available
+    DropdownModule,     // PrimeNG dropdowns for filters
+    ButtonModule,       // PrimeNG buttons for actions
+    TagModule,          // PrimeNG tag/badges in table
+    TableModule,        // PrimeNG table for devices list
+    NgApexchartsModule  // ApexCharts wrapper
   ],
   templateUrl: './health-dashboard-overview.component.html',
   styleUrls: [
@@ -52,18 +56,17 @@ import type {
 export class HealthDashboardOverviewComponent {
   protected readonly username = 'John Doe';
 
-  // Soft guard so SSR and pre-install states don't break the build if ng-apexcharts is unresolved at runtime.
-  // We assume bundler will include it when installed; before that, we render a simple placeholder.
+  // Soft chart render guard (kept for future SSR conditions)
   readonly canRenderCharts = true;
 
-  // Filters
+  // Filters state
   filters: WritableSignal<{ device: string; period: string; region: string }> = signal({
     device: 'All Devices',
     period: 'Last 30d',
     region: 'All',
   });
 
-  // PrimeNG Dropdown expects mutable arrays; provide {label,value} items
+  // PrimeNG Dropdown expects {label,value}
   deviceOptions: Array<{ label: string; value: string }> = [
     { label: 'All Devices', value: 'All Devices' },
     { label: 'Gateway', value: 'Gateway' },
@@ -84,7 +87,7 @@ export class HealthDashboardOverviewComponent {
     { label: 'APAC', value: 'APAC' },
   ];
 
-  // Metrics
+  // Metrics cards
   metrics = signal([
     { key: 'Healthy', value: 308, tone: 'ok' as const },
     { key: 'Warning', value: 12, tone: 'warn' as const },
@@ -107,18 +110,9 @@ export class HealthDashboardOverviewComponent {
 
   // ApexCharts configuration
   chartSeries: ApexAxisChartSeries = [
-    {
-      name: 'Healthy',
-      data: [140, 150, 160, 170, 180, 190, 200, 210, 215, 220, 225, 230],
-    },
-    {
-      name: 'Warning',
-      data: [90, 88, 89, 87, 90, 88, 89, 87, 88, 89, 88, 88],
-    },
-    {
-      name: 'Anomaly',
-      data: [80, 82, 84, 83, 85, 84, 82, 83, 82, 83, 84, 85],
-    },
+    { name: 'Healthy', data: [140, 150, 160, 170, 180, 190, 200, 210, 215, 220, 225, 230] },
+    { name: 'Warning', data: [90, 88, 89, 87, 90, 88, 89, 87, 88, 89, 88, 88] },
+    { name: 'Anomaly', data: [80, 82, 84, 83, 85, 84, 82, 83, 82, 83, 84, 85] },
   ];
   chartOptions: {
     chart: ApexChart;
@@ -133,41 +127,17 @@ export class HealthDashboardOverviewComponent {
     tooltip: ApexTooltip;
     colors: string[];
   } = {
-    chart: {
-      type: 'area',
-      height: 300,
-      toolbar: { show: false },
-      animations: { enabled: true }
-    },
+    chart: { type: 'area', height: 300, toolbar: { show: false }, animations: { enabled: true } },
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth', width: 2 },
     xaxis: {
       categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-      labels: { style: { colors: '#64748b' } }
+      axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748b' } }
     },
-    yaxis: {
-      labels: { style: { colors: '#64748b' } }
-    },
-    legend: {
-      position: 'top',
-      horizontalAlign: 'left',
-      labels: { colors: '#64748b' }
-    },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.25,
-        opacityTo: 0.01,
-        stops: [0, 95, 100]
-      }
-    },
-    grid: {
-      borderColor: '#e2e8f0',
-      strokeDashArray: 4
-    },
+    yaxis: { labels: { style: { colors: '#64748b' } } },
+    legend: { position: 'top', horizontalAlign: 'left', labels: { colors: '#64748b' } },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.01, stops: [0, 95, 100] } },
+    grid: { borderColor: '#e2e8f0', strokeDashArray: 4 },
     markers: { size: 0 },
     tooltip: { theme: 'light' },
     colors: ['#10B981', '#F59E0B', '#EF4444']

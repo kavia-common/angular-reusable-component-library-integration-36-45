@@ -41,6 +41,7 @@
 
 .panel__image { display: block; }
 
+/* Tables */
 .table-wrapper :where(th) {
   background: #f8fafc;
   font-weight: 600;
@@ -51,15 +52,19 @@
   outline-offset: 2px;
 }
 
-/* Ensure PrimeNG table header aligns with Figma header BG */
+/* Ensure PrimeNG table header aligns with Figma header BG and compact grid spacing.
+   Using ::ng-deep for scoped overrides within this component only. */
 :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
   background: #f8fafc;
   font-weight: 600;
   border-bottom: 1px solid #e5e7eb;
 }
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th,
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 10px 12px;
+}
 
 /* Tighten PrimeNG paddings for compact look */
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
-  padding: 10px 12px;
   border-bottom: 1px solid #f1f5f9;
 }
