@@ -1,26 +1,44 @@
 import { ChangeDetectionStrategy, Component, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
-/* Note:
- * PrimeNG + ng-apexcharts imports are temporarily disabled to allow CI builds in environments
- * that don't run npm install before building. The template is adjusted accordingly to use
- * native elements until dependencies are ensured. To re-enable, import the modules below and
- * restore the PrimeNG/ApexChart markup in the template.
- */
-// import { FormsModule } from '@angular/forms';
-// import { DropdownModule } from 'primeng/dropdown';
-// import { ButtonModule } from 'primeng/button';
-// import { TagModule } from 'primeng/tag';
-// import { TableModule } from 'primeng/table';
-// import { NgApexchartsModule } from 'ng-apexcharts';
-// import type { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexStroke, ApexXAxis, ApexLegend, ApexFill, ApexGrid } from 'ng-apexcharts';
+// PrimeNG modules
+import { DropdownModule } from 'primeng/dropdown';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { TableModule } from 'primeng/table';
+
+// ApexCharts
+import { NgApexchartsModule } from 'ng-apexcharts';
+import type {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexDataLabels,
+  ApexStroke,
+  ApexXAxis,
+  ApexLegend,
+  ApexFill,
+  ApexGrid,
+  ApexMarkers,
+  ApexTooltip,
+  ApexYAxis
+} from 'ng-apexcharts';
 
 // PUBLIC_INTERFACE
 @Component({
   selector: 'app-health-dashboard-overview',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    DropdownModule,
+    ButtonModule,
+    TagModule,
+    TableModule,
+    NgApexchartsModule
+  ],
   templateUrl: './health-dashboard-overview.component.html',
   styleUrls: ['./health-dashboard-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,9 +53,26 @@ export class HealthDashboardOverviewComponent {
     region: 'All',
   });
 
-  deviceOptions = ['All Devices', 'Gateway', 'Sensor', 'Controller'] as const;
-  periodOptions = ['Last 7d', 'Last 30d', 'Last 90d'] as const;
-  regionOptions = ['All', 'NA', 'EU', 'APAC'] as const;
+  // PrimeNG Dropdown expects mutable arrays; provide {label,value} items
+  deviceOptions: Array<{ label: string; value: string }> = [
+    { label: 'All Devices', value: 'All Devices' },
+    { label: 'Gateway', value: 'Gateway' },
+    { label: 'Sensor', value: 'Sensor' },
+    { label: 'Controller', value: 'Controller' },
+  ];
+
+  periodOptions: Array<{ label: string; value: string }> = [
+    { label: 'Last 7d', value: 'Last 7d' },
+    { label: 'Last 30d', value: 'Last 30d' },
+    { label: 'Last 90d', value: 'Last 90d' },
+  ];
+
+  regionOptions: Array<{ label: string; value: string }> = [
+    { label: 'All', value: 'All' },
+    { label: 'NA', value: 'NA' },
+    { label: 'EU', value: 'EU' },
+    { label: 'APAC', value: 'APAC' },
+  ];
 
   // Metrics
   metrics = signal([
@@ -59,6 +94,74 @@ export class HealthDashboardOverviewComponent {
     { id: 'DEV-112', location: 'TX', status: 'Warning', seen: '5m ago' },
     { id: 'DEV-245', location: 'CA', status: 'Anomaly', seen: '1m ago' },
   ]);
+
+  // ApexCharts configuration
+  chartSeries: ApexAxisChartSeries = [
+    {
+      name: 'Healthy',
+      data: [140, 150, 160, 170, 180, 190, 200, 210, 215, 220, 225, 230],
+    },
+    {
+      name: 'Warning',
+      data: [90, 88, 89, 87, 90, 88, 89, 87, 88, 89, 88, 88],
+    },
+    {
+      name: 'Anomaly',
+      data: [80, 82, 84, 83, 85, 84, 82, 83, 82, 83, 84, 85],
+    },
+  ];
+  chartOptions: {
+    chart: ApexChart;
+    dataLabels: ApexDataLabels;
+    stroke: ApexStroke;
+    xaxis: ApexXAxis;
+    yaxis: ApexYAxis;
+    legend: ApexLegend;
+    fill: ApexFill;
+    grid: ApexGrid;
+    markers: ApexMarkers;
+    tooltip: ApexTooltip;
+    colors: string[];
+  } = {
+    chart: {
+      type: 'area',
+      height: 300,
+      toolbar: { show: false },
+      animations: { enabled: true }
+    },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    xaxis: {
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      labels: { style: { colors: '#64748b' } }
+    },
+    yaxis: {
+      labels: { style: { colors: '#64748b' } }
+    },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
+      labels: { colors: '#64748b' }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.25,
+        opacityTo: 0.01,
+        stops: [0, 95, 100]
+      }
+    },
+    grid: {
+      borderColor: '#e2e8f0',
+      strokeDashArray: 4
+    },
+    markers: { size: 0 },
+    tooltip: { theme: 'light' },
+    colors: ['#10B981', '#F59E0B', '#EF4444']
+  };
 
   // PUBLIC_INTERFACE
   /** Update an inline filter option by key and value. */

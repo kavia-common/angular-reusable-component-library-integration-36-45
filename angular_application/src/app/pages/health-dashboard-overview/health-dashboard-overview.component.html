@@ -5,8 +5,8 @@
     <h1 id="page-title" class="hd-title font-bold text-[clamp(18px,2vw,22px)]">Welcome, {{ username }}!</h1>
   </div>
   <nav class="hd-header__actions flex items-center gap-2" aria-label="Header actions">
-    <button type="button" class="btn btn--ghost px-3 py-2 rounded-md border border-slate-200" aria-label="Notifications">•</button>
-    <button type="button" class="btn btn--primary px-3 py-2 rounded-md text-white" style="background:#2563EB">New Report</button>
+    <button pButton type="button" class="p-button-text px-3 py-2 rounded-md border border-slate-200" aria-label="Notifications">•</button>
+    <button pButton type="button" class="p-button px-3 py-2 rounded-md text-white" style="background:#2563EB;border-color:#2563EB">New Report</button>
   </nav>
 </section>
 
@@ -17,15 +17,36 @@
       <h2 id="overview-heading" class="hd-h2 font-semibold text-[clamp(16px,1.6vw,20px)]">Overview</h2>
 
       <div class="hd-filters flex gap-2 flex-wrap" role="group" aria-label="Overview filters">
-        <select [value]="filters().device" (change)="updateFilter('device', ($any($event.target).value))" class="border rounded-md px-2 py-1">
-          <option *ngFor="let o of deviceOptions; trackBy: trackByIndex" [value]="o">{{ o }}</option>
-        </select>
-        <select [value]="filters().period" (change)="updateFilter('period', ($any($event.target).value))" class="border rounded-md px-2 py-1">
-          <option *ngFor="let o of periodOptions; trackBy: trackByIndex" [value]="o">{{ o }}</option>
-        </select>
-        <select [value]="filters().region" (change)="updateFilter('region', ($any($event.target).value))" class="border rounded-md px-2 py-1">
-          <option *ngFor="let o of regionOptions; trackBy: trackByIndex" [value]="o">{{ o }}</option>
-        </select>
+        <p-dropdown
+          [options]="deviceOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="filters().device"
+          (onChange)="updateFilter('device', $event.value)"
+          [style]="{minWidth:'12rem'}"
+          [showClear]="false"
+          placeholder="Device"
+        ></p-dropdown>
+        <p-dropdown
+          [options]="periodOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="filters().period"
+          (onChange)="updateFilter('period', $event.value)"
+          [style]="{minWidth:'10rem'}"
+          [showClear]="false"
+          placeholder="Period"
+        ></p-dropdown>
+        <p-dropdown
+          [options]="regionOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="filters().region"
+          (onChange)="updateFilter('region', $event.value)"
+          [style]="{minWidth:'10rem'}"
+          [showClear]="false"
+          placeholder="Region"
+        ></p-dropdown>
       </div>
     </div>
 
@@ -80,7 +101,7 @@
         </div>
       </article>
 
-      <!-- Chart placeholder (ApexCharts disabled for CI environment without node_modules) -->
+      <!-- Chart using ng-apexcharts -->
       <article class="panel panel--chart rounded-xl border border-slate-100 shadow-sm overflow-hidden" aria-labelledby="panel-chart-heading">
         <header class="panel__header flex items-center justify-between px-4 py-3 border-b border-slate-100">
           <h3 id="panel-chart-heading" class="hd-h3 font-semibold text-[clamp(14px,1.4vw,18px)]">Trend</h3>
@@ -91,18 +112,20 @@
           </div>
         </header>
         <div class="panel__body p-4">
-          <svg viewBox="0 0 600 220" class="w-full h-auto rounded-md border border-slate-200">
-            <rect x="0" y="0" width="600" height="220" fill="url(#grad)" />
-            <defs>
-              <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="rgba(37,99,235,0.12)"/>
-                <stop offset="100%" stop-color="#ffffff"/>
-              </linearGradient>
-            </defs>
-            <polyline fill="none" stroke="#10B981" stroke-width="2" points="0,160 60,150 120,140 180,135 240,130 300,120 360,110 420,100 480,95 540,90 600,85" />
-            <polyline fill="none" stroke="#F59E0B" stroke-width="2" points="0,190 60,188 120,189 180,187 240,190 300,188 360,189 420,187 480,188 540,189 600,188" />
-            <polyline fill="none" stroke="#EF4444" stroke-width="2" points="0,200 60,198 120,196 180,197 240,195 300,196 360,198 420,197 480,198 540,197 600,196" />
-          </svg>
+          <apx-chart
+            [series]="chartSeries"
+            [chart]="chartOptions.chart"
+            [dataLabels]="chartOptions.dataLabels"
+            [stroke]="chartOptions.stroke"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [legend]="chartOptions.legend"
+            [fill]="chartOptions.fill"
+            [grid]="chartOptions.grid"
+            [markers]="chartOptions.markers"
+            [tooltip]="chartOptions.tooltip"
+            [colors]="chartOptions.colors"
+          ></apx-chart>
         </div>
       </article>
     </div>
@@ -128,18 +151,14 @@
             <td>{{ row.id }}</td>
             <td>{{ row.location }}</td>
             <td>
-              <span
-                class="badge inline-block text-xs font-semibold px-2 py-1 rounded-full"
-                [ngClass]="{
-                  'ok bg-emerald-50 text-emerald-800': row.status === 'Healthy',
-                  'warn bg-amber-50 text-amber-800': row.status === 'Warning',
-                  'error bg-rose-50 text-rose-800': row.status === 'Anomaly'
-                }"
-              >{{ row.status }}</span>
+              <p-tag
+                [value]="row.status"
+                [severity]="row.status === 'Healthy' ? 'success' : (row.status === 'Warning' ? 'warning' : 'danger')"
+              ></p-tag>
             </td>
             <td>{{ row.seen }}</td>
             <td>
-              <button type="button" class="px-2 py-1 border border-slate-200 rounded-md">View</button>
+              <button pButton type="button" class="p-button-outlined px-2 py-1 rounded-md">View</button>
             </td>
           </tr>
         </tbody>

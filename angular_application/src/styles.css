@@ -1,14 +1,10 @@
-/* PrimeNG theme + base + icons + PrimeFlex utilities
-   NOTE: Disabled for CI environments where node_modules may not be installed before build.
-   To re-enable PrimeNG styling, uncomment these lines once npm install is guaranteed prior to ng build.
-
+/* PrimeNG theme + base + icons + PrimeFlex utilities */
 @import "primeng/resources/themes/lara-light-blue/theme.css";
 @import "primeng/resources/primeng.min.css";
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
-*/
 
-/* Global styles for minimalistic design */
+/* Keep Tailwind directives if present elsewhere (none here) and preserve existing global styles */
 * {
   margin: 0;
   padding: 0;
