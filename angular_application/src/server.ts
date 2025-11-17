@@ -12,17 +12,131 @@ const indexHtml = join(serverDistFolder, 'index.server.html');
 const app = express();
 const commonEngine = new CommonEngine();
 
+// Middleware: JSON body parser and basic logging for API routes
+app.use(express.json());
+app.use((req, _res, next) => {
+  if (req.path.startsWith('/api/')) {
+    console.log(`[API] ${req.method} ${req.originalUrl}`);
+  }
+  next();
+});
+
+// Ensure fetch and AbortController exist in Node SSR environment
+const ensureServerFetch = async () => {
+  const g: any = globalThis as any;
+  if (typeof g.fetch !== 'function') {
+    // Lazy import node-fetch for SSR if missing
+    const mod = await import('node-fetch');
+    g.fetch = (mod as any).default || (mod as any);
+    // Attach Response type compatibility implicitly via node-fetch
+  }
+  if (typeof g.AbortController === 'undefined') {
+    try {
+      const ac = await import('abort-controller');
+      g.AbortController = (ac as any).default || (ac as any);
+    } catch {
+      // Node 18+ has AbortController; ignore if import fails.
+    }
+  }
+};
+
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * PUBLIC_INTERFACE
+ * POST /api/figma/add_figma_data
+ * This endpoint receives Figma import requests and validates input payload.
+ * Query params:
+ *  - project_id: string|number (required)
+ * Body:
+ *  - fileKey: string (required) - Figma file key
+ *  - accessToken: string (required) - Figma Personal Access Token
+ * Returns:
+ *  - 200: { message, projectId, fileKey }
+ *  - 400: { error, details }
+ *  - 500: { error, requestId }
  */
+app.post('/api/figma/add_figma_data', async (req, res) => {
+  const requestId = Math.random().toString(36).slice(2, 10);
+  try {
+    const projectId = (req.query['project_id'] ?? '').toString().trim();
+    const { fileKey, accessToken } = req.body ?? {};
+
+    // Defensive validation
+    const errors: string[] = [];
+    if (!projectId || projectId === 'undefined' || projectId === 'null') {
+      errors.push('Missing or invalid project_id query parameter.');
+    }
+    if (!fileKey || typeof fileKey !== 'string' || fileKey.trim().length === 0) {
+      errors.push('Missing or invalid fileKey in request body.');
+    }
+    if (!accessToken || typeof accessToken !== 'string' || accessToken.trim().length === 0) {
+      errors.push('Missing or invalid accessToken in request body.');
+    }
+
+    if (errors.length) {
+      console.warn(`[API][${requestId}] Validation failed`, { projectId, hasToken: !!accessToken, hasKey: !!fileKey, errors });
+      return res.status(400).json({
+        error: 'Invalid request payload',
+        details: errors,
+      });
+    }
+
+    // Optional: Enforce allowed origins/backend mode via env flags
+    const nodeEnv = process.env['NG_APP_NODE_ENV'] || process.env['NODE_ENV'] || 'production';
+    const allowOutbound = (process.env['NG_APP_FEATURE_FLAGS'] || '').includes('allowFigmaOutbound');
+
+    // If outbound allowed, verify fileKey/token with Figma API (lightweight probe)
+    if (allowOutbound) {
+      await ensureServerFetch();
+      try {
+        const controller = new (globalThis as any).AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
+        const resp = await (globalThis as any).fetch(`https://api.figma.com/v1/files/${encodeURIComponent(fileKey)}`, {
+          method: 'GET',
+          headers: {
+            'X-Figma-Token': accessToken,
+          },
+          signal: controller.signal,
+        });
+        clearTimeout(timeout as any);
+        if (resp.status === 404) {
+          return res.status(400).json({
+            error: 'Figma file not found',
+            details: [`File key ${fileKey} does not exist or is not accessible.`],
+          });
+        }
+        if (resp.status === 403) {
+          return res.status(400).json({
+            error: 'Unauthorized',
+            details: ['Invalid accessToken or no access to the Figma file.'],
+          });
+        }
+        if (!resp.ok) {
+          let t = '';
+          try { t = await resp.text(); } catch {}
+          console.warn(`[API][${requestId}] Figma probe non-OK`, resp.status, t);
+        }
+      } catch (probeErr: any) {
+        console.warn(`[API][${requestId}] Figma probe failed:`, probeErr?.message || probeErr);
+      }
+    }
+
+    // Simulate persistence/processing step success.
+    const responsePayload = {
+      message: 'Figma data accepted for processing',
+      projectId,
+      fileKey,
+      env: process.env['NG_APP_NODE_ENV'] || process.env['NODE_ENV'] || 'production',
+    };
+    console.log(`[API][${requestId}] Accepted Figma import`, { projectId, fileKey, nodeEnv: responsePayload.env });
+    return res.status(200).json(responsePayload);
+  } catch (err: any) {
+    console.error(`[API][${requestId}] Unexpected error`, err?.stack || err?.message || err);
+    return res.status(500).json({
+      error: 'Internal server error',
+      requestId,
+    });
+  }
+});
 
 /**
  * Serve static files from /browser

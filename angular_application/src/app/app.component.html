@@ -1,3 +1,12 @@
-<div class="container">
+<div class="container" style="flex-direction:column; gap:16px; width:100%; max-width:720px; padding:24px;">
   <h1>{{ title }}</h1>
+
+  <form (submit)="onSubmit($event)" style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:16px;">
+    <label>Project ID <input name="projectId" [value]="demo.projectId" (input)="demo.projectId = ($any($event.target).value)" /></label>
+    <label>Figma File Key <input name="fileKey" [value]="demo.fileKey" (input)="demo.fileKey = ($any($event.target).value)" /></label>
+    <label>Figma Access Token <input name="accessToken" type="password" [value]="demo.accessToken" (input)="demo.accessToken = ($any($event.target).value)" /></label>
+    <button type="submit" style="padding:8px 12px; background:#2563EB; color:#fff; border:none; border-radius:6px; cursor:pointer;">Send</button>
+  </form>
+
+  <pre style="background:#f5f5f5; border-radius:8px; padding:12px; width:100%; overflow:auto; min-height:80px;">{{ output }}</pre>
 </div>
