@@ -149,7 +149,7 @@
             ></apx-chart>
           </ng-container>
           <ng-template #chartSsrStub>
-            <div class="chart-placeholder rounded-lg border border-slate-200" role="img" aria-label="Chart placeholder"></div>
+            <div class="chart-placeholder rounded-lg border border-slate-200 h-[300px] md:h-[280px]" role="img" aria-label="Chart placeholder"></div>
           </ng-template>
         </div>
       </article>
@@ -166,6 +166,7 @@
         [tableStyle]="{'min-width':'40rem'}"
         styleClass="w-full"
       >
+        <caption class="visually-hidden">Device status list showing device ID, location, status, last seen time, and actions</caption>
         <ng-template pTemplate="header">
           <tr>
             <th scope="col" class="text-left">Device</th>
